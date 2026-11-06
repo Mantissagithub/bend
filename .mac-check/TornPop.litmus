@@ -1,0 +1,17 @@
+AArch64 TornPop
+"BendRT ring: consumer pops slot 0 (task 1), producer refills it with task 3. Instructions as clang -O3 emits them."
+{
+lo=1; hi=1; get=0;
+0:X4=hi; 0:X5=lo; 0:X6=get;
+1:X4=hi; 1:X5=lo; 1:X6=get;
+}
+ P0                | P1               ;
+ LDAR W0,[X4]      | LDR W0,[X6]      ;
+ LDR W1,[X5]       | CMP W0,#1        ;
+ MOV W2,#1         | B.NE LC00        ;
+ STR W2,[X6]       | MOV W1,#3        ;
+                   | STR W1,[X5]      ;
+                   | MOV W2,#3        ;
+                   | STLR W2,[X4]     ;
+                   | LC00:            ;
+exists (0:X0=1 /\ 0:X1=3 /\ 1:X0=1)
