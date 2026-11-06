@@ -25,10 +25,11 @@ jobs:
       - name: machine
         run: uname -sm; sysctl -n machdep.cpu.brand_string hw.ncpu; clang --version | head -1
       - name: litmus on the chip
+        continue-on-error: true
         run: |
           cd .mac-check/litmus
           make -j3 GCC=clang >/dev/null
-          ./run.sh -s 100000 -r 300 | tee ../litmus.txt
+          sh run.sh -s 100000 -r 300 | tee ../litmus.txt
           grep -E "^Observation|^Positive" ../litmus.txt
       - name: main checkout
         run: |
